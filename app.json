@@ -1,29 +1,57 @@
 {
   "expo": {
-    "name": "BiPejota_App",
-    "slug": "BiPejota_App",
+    "name": "BiPejota",
+    "slug": "BiPejota",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#242424"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "userInterfaceStyle": "automatic"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#242424"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "userInterfaceStyle": "automatic"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "fonts": [
+      {
+        "asset": "assets/fonts/Montserrat-Regular.ttf",
+        "family": "Montserrat"
+      },
+      {
+        "asset": "assets/fonts/Montserrat-Italic.ttf",
+        "family": "Montserrat-Italic"
+      },
+      {
+        "asset": "assets/fonts/Montserrat-Bold.ttf",
+        "family": "Montserrat-Bold"
+      },
+      {
+        "asset": "assets/fonts/Montserrat-SemiBold.ttf",
+        "family": "Montserrat-SemiBold"
+      },
+      {
+        "asset": "assets/fonts/Montserrat-Light.ttf",
+        "family": "Montserrat-Light"
+      },
+      {
+        "asset": "assets/fonts/Montserrat-Medium.ttf",
+        "family": "Montserrat-Medium"
+      }
+    ]
   }
 }
