@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground } from
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { logos, backgrounds } from '../../utils/images';
 import { useFonts } from '../../hooks/useFonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const Welcome = () => {
     const { colors, isDark, themeType } = useAppTheme();
@@ -34,9 +35,17 @@ const Welcome = () => {
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: colors.accent.primary }]}
                 >
-                    <Text style={[heading.h2, { color: colors.text.inverse, textAlign: 'center', fontSize: 18, fontWeight: '600', }]}>
-                        Começar
-                    </Text>
+                    <View style={styles.buttonContent}>
+                        <Text style={[heading.h2, { color: colors.text.inverse, fontSize: 18 }]}>
+                            Começar
+                        </Text>
+                        <Ionicons
+                            name="chevron-forward-circle-outline"
+                            size={22}
+                            color={colors.text.inverse}
+                            style={{ marginLeft: 8, marginTop: 2 }}
+                        />
+                    </View>
                 </TouchableOpacity>
             </View>
         </ImageBackground>
@@ -73,6 +82,12 @@ const styles = StyleSheet.create({
         minWidth: 300,
         marginBottom: 30,
         alignSelf: 'center',
+        textAlignVertical: 'center',
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     buttonText: {
         fontSize: 16,

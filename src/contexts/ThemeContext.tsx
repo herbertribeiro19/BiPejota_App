@@ -33,7 +33,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const [isDark, setIsDark] = useState(false);
 
     // Debug logs
-    console.log('🔍 Debug Theme:', {
+    console.log('Debug Theme:', {
         systemColorScheme,
         themeType,
         isDark
@@ -44,7 +44,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         const shouldUseDark = themeType === 'dark' ||
             (themeType === 'system' && systemColorScheme === 'dark');
 
-        console.log('🎨 Tema escolhido:', shouldUseDark ? 'DARK' : 'LIGHT');
+        console.log('Tema escolhido:', shouldUseDark ? 'DARK' : 'LIGHT');
 
         return shouldUseDark ? darkColors : lightColors;
     };
