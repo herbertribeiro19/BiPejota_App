@@ -1,14 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { logos, backgrounds } from '../../utils/images';
 import { useFonts } from '../../hooks/useFonts';
-import { Ionicons } from '@expo/vector-icons';
 
 const Welcome = () => {
-    const { colors, isDark, themeType } = useAppTheme();
+    const navigation = useNavigation();
+    const { colors, isDark } = useAppTheme();
     const { fonts, text, heading } = useFonts();
     const themeKey = isDark ? 'dark' : 'light';
+
+    const handleStart = () => {
+        navigation.navigate('Login' as never);
+    };
 
     return (
         <ImageBackground
@@ -22,10 +27,10 @@ const Welcome = () => {
                 resizeMode="contain"
             />
             <View style={[styles.container]}>
-                <Text style={[heading.h2, { color: colors.accent.primary, textAlign: 'center', fontWeight: '600' }]}>
+                <Text style={[heading.h2, { color: colors.accent.primary, textAlign: 'center', fontWeight: '500' }]}>
                     Bem-vindo ao BiPejota!
                 </Text>
-                <Text style={[heading.h1, { color: colors.text.primary, fontSize: 26, textAlign: 'center', marginTop: 10, fontWeight: '700' }]}>
+                <Text style={[heading.h1, { color: colors.text.primary, fontSize: 26, textAlign: 'center', marginTop: 10 }]}>
                     Domine seu tempo, potencialize seus resultados
                 </Text>
                 <Text style={[text.md, { color: colors.text.secondary, fontSize: 14, textAlign: 'center', marginBottom: 20 }]}>
@@ -34,17 +39,15 @@ const Welcome = () => {
 
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: colors.accent.primary }]}
+                    onPress={handleStart}
                 >
                     <View style={styles.buttonContent}>
                         <Text style={[heading.h2, { color: colors.text.inverse, fontSize: 18 }]}>
                             Começar
                         </Text>
-                        <Ionicons
-                            name="chevron-forward-circle-outline"
-                            size={22}
-                            color={colors.text.inverse}
-                            style={{ marginLeft: 8, marginTop: 2 }}
-                        />
+                        <Text style={[heading.h2, { color: colors.text.inverse, fontSize: 18, marginLeft: 8 }]}>
+                            →
+                        </Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -58,40 +61,18 @@ const styles = StyleSheet.create({
         padding: 20,
         gap: 10,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-        marginTop: 200,
-    },
-    debugContainer: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        padding: 15,
-        borderRadius: 8,
-        marginBottom: 20,
-    },
-    debugText: {
-        fontSize: 14,
-        marginBottom: 5,
-    },
     button: {
         paddingHorizontal: 22,
         paddingVertical: 16,
         borderRadius: 26,
         minWidth: 300,
-        marginBottom: 30,
+        marginBottom: 20,
         alignSelf: 'center',
-        textAlignVertical: 'center',
     },
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    buttonText: {
-        fontSize: 16,
-        fontWeight: '600',
     },
 });
 

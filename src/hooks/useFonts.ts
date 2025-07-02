@@ -16,7 +16,7 @@ export const useFonts = () => {
       xxxl: { fontFamily: fonts.regular, fontSize: fontSizes.xxxl },
     },
     heading: {
-      h1: { fontFamily: fonts.bold, fontSize: fontSizes.xxxl, fontWeight: fontWeights.semiBold },
+      h1: { fontFamily: fonts.bold, fontSize: fontSizes.xxxl },
       h2: { fontFamily: fonts.bold, fontSize: fontSizes.xxl },
       h3: { fontFamily: fonts.semiBold, fontSize: fontSizes.xl },
       h4: { fontFamily: fonts.medium, fontSize: fontSizes.lg },
