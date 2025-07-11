@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { API_URL } from '../config/env';
 import { storageService } from './storageService';
 
+
+const API_URL = 'http://localhost:4020';
 // Criando instância do axios com configurações padrão
 export const api = axios.create({
   baseURL: API_URL,

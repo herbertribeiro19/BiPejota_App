@@ -5,12 +5,15 @@ import { logos, backgrounds } from '../../utils/images';
 import { useFonts } from '../../hooks/useFonts';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../hooks/useToast';
+import Toast from '../../components/Toast';
 
 const Login = () => {
     const navigation = useNavigation();
     const { colors, isDark } = useAppTheme();
     const { login, loading } = useAuth();
     const { fonts, text, heading } = useFonts();
+    const { toast, showError, showSuccess, hideToast } = useToast();
     const themeKey = isDark ? 'dark' : 'light';
 
     const [formData, setFormData] = useState({
@@ -26,10 +29,19 @@ const Login = () => {
         try {
             console.log('Iniciando login...');
             await login(formData);
-            // Não precisa navegar manualmente - o sistema faz automaticamente
+            showSuccess('Bem vindo de volta! :)');
+            setTimeout(() => {
+                navigation.navigate('Main' as never);
+            }, 2000);
         } catch (error: any) {
-            console.error('Erro ao fazer login:', error.message);
-            // Aqui você pode mostrar um alerta de erro
+            // Extrair mensagem de erro
+            // let errorMessage = 'Erro ao fazer login';
+            // if (error?.message) {
+            //     errorMessage = error.message;
+            // } else if (typeof error === 'string') {
+            //     errorMessage = error;
+            // }
+            showError("Erro ao fazer login, tente novamente.");
         }
     };
 
@@ -39,6 +51,14 @@ const Login = () => {
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
             resizeMode="cover"
         >
+            <Toast
+                visible={toast.visible}
+                message={toast.message}
+                type={toast.type}
+                duration={toast.duration}
+                onHide={hideToast}
+            />
+
             <Image
                 source={logos[themeKey]}
                 style={{ width: 93, height: 93, marginBottom: 10, marginTop: 160 }}

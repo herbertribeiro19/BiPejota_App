@@ -1,4 +1,4 @@
-import { api, ApiResponse, ErrorResponse } from './api';
+import { api } from './api';
 import { storageService } from './storageService';
 
 // Tipos para autenticação
@@ -28,71 +28,61 @@ export interface AuthResponse {
   userId: number;
 }
 
-// Serviço de autenticação
+// Serviço de autenticação simplificado
 export const authService = {
   // Registrar novo usuário
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
+      console.log('Enviando dados para registro:', data);
       const response = await api.post<AuthResponse>('/auth/register', data);
+      console.log('Resposta da API:', response.data);
       
-      // Salvar token e userId no storage
-      await storageService.saveToken(response.data.token);
-      await storageService.saveUserId(response.data.userId);
+      // Não salvar token no registro - apenas retornar sucesso
+      // O token será salvo apenas no login
       
       return response.data;
     } catch (error: any) {
-      throw this.handleError(error);
+      // console.error('Erro no registro:', error);
+      throw error.response ? error.response.data : "Erro ao registrar usuário";
     }
   },
 
   // Fazer login
   async login(data: LoginData): Promise<AuthResponse> {
     try {
+      console.log('Enviando dados para login:', data);
       const response = await api.post<AuthResponse>('/auth/login', data);
-      
       console.log('Resposta da API:', response.data);
       
-      // Salvar token e userId no storage
-      await storageService.saveToken(response.data.token);
-      await storageService.saveUserId(response.data.userId);
-      
-      return response.data;
-    } catch (error: any) {
-      throw this.handleError(error);
-    }
-  },
-
-  // Buscar dados do usuário logado
-  async getMe(): Promise<User> {
-    try {
-      const response = await api.get<User>('/auth/me');
-      return response.data;
-    } catch (error: any) {
-      // Se o endpoint não existir, criar usuário temporário
-      console.log('⚠️ Endpoint /auth/me não encontrado, criando usuário temporário');
-      const { userId } = await this.getStoredAuthData();
-      
-      // Retornar usuário temporário baseado no userId
-      return {
-        id: userId?.toString() || '0',
-        name: 'Usuário',
-        email: 'usuario@email.com',
+      // Criar objeto usuário baseado na resposta
+      const user: User = {
+        id: response.data.userId.toString(),
+        name: data.email.split('@')[0], // Usar parte do email como nome temporário
+        email: data.email,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
+      
+      console.log('Objeto usuário criado:', user);
+      
+      // Salvar token e dados do usuário no storage
+      await storageService.saveToken(response.data.token);
+      await storageService.saveUserData(user);
+      
+      return response.data;
+    } catch (error: any) {
+      // console.error('Erro no login:', error);
+      throw error.response ? error.response.data : "Erro ao fazer login";
     }
   },
 
   // Fazer logout
   async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout');
-    } catch (error: any) {
-      // Mesmo com erro, consideramos logout realizado
-      console.log('Logout error:', error);
-    } finally {
-      // Sempre limpar os dados locais
+      // Limpar dados locais
       await storageService.clearAuthData();
+    } catch (error) {
+      // console.error('Erro ao fazer logout:', error);
     }
   },
 
@@ -101,33 +91,24 @@ export const authService = {
     return await storageService.hasToken();
   },
 
-  // Buscar dados salvos
-  async getStoredAuthData(): Promise<{ token: string | null; userId: number | null }> {
-    const token = await storageService.getToken();
-    const userId = await storageService.getUserId();
-    return { token, userId };
+  // Buscar dados do usuário salvo
+  async getStoredUser(): Promise<User | null> {
+    return await storageService.getUserData();
   },
 
-  // Tratar erros da API
-  handleError(error: any): ErrorResponse {
-    if (error.response?.data) {
-      return {
-        success: false,
-        message: error.response.data.message || 'Erro na requisição',
-        errors: error.response.data.errors,
-      };
+  // Buscar dados completos do usuário da API
+  async getMe(): Promise<User | null> {
+    try {
+      const response = await api.get<User>('/auth/me');
+      const userData = response.data;
+      
+      // Salvar dados atualizados
+      await storageService.saveUserData(userData);
+      
+      return userData;
+    } catch (error: any) {
+      console.log('Endpoint /auth/me não disponível, usando dados salvos');
+      return await this.getStoredUser();
     }
-    
-    if (error.request) {
-      return {
-        success: false,
-        message: 'Erro de conexão. Verifique sua internet.',
-      };
-    }
-    
-    return {
-      success: false,
-      message: error.message || 'Erro desconhecido',
-    };
   },
 };

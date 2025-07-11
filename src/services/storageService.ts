@@ -12,7 +12,7 @@ export const storageService = {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
     } catch (error) {
-      console.error('Erro ao salvar token:', error);
+      console.log('Erro ao salvar token:', error);
       throw error;
     }
   },
@@ -22,7 +22,7 @@ export const storageService = {
     try {
       return await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
     } catch (error) {
-      console.error('Erro ao buscar token:', error);
+      console.log('Erro ao buscar token:', error);
       return null;
     }
   },
@@ -32,7 +32,7 @@ export const storageService = {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.USER_ID, userId.toString());
     } catch (error) {
-      console.error('Erro ao salvar userId:', error);
+      console.log('Erro ao salvar userId:', error);
       throw error;
     }
   },
@@ -43,7 +43,7 @@ export const storageService = {
       const userId = await AsyncStorage.getItem(STORAGE_KEYS.USER_ID);
       return userId ? parseInt(userId, 10) : null;
     } catch (error) {
-      console.error('Erro ao buscar userId:', error);
+      console.log('Erro ao buscar userId:', error);
       return null;
     }
   },
@@ -51,9 +51,13 @@ export const storageService = {
   // Salvar dados do usuário
   async saveUserData(userData: any): Promise<void> {
     try {
+      if (!userData) {
+        console.warn('Tentativa de salvar dados do usuário undefined/null');
+        return;
+      }
       await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
     } catch (error) {
-      console.error('Erro ao salvar dados do usuário:', error);
+      console.log('Erro ao salvar dados do usuário:', error);
       throw error;
     }
   },
@@ -64,7 +68,7 @@ export const storageService = {
       const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      console.error('Erro ao buscar dados do usuário:', error);
+      console.log('Erro ao buscar dados do usuário:', error);
       return null;
     }
   },
@@ -78,7 +82,7 @@ export const storageService = {
         STORAGE_KEYS.USER_DATA,
       ]);
     } catch (error) {
-      console.error('Erro ao limpar dados de autenticação:', error);
+      console.log('Erro ao limpar dados de autenticação:', error);
       throw error;
     }
   },

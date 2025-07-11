@@ -5,12 +5,15 @@ import { logos, backgrounds } from '../../utils/images';
 import { useFonts } from '../../hooks/useFonts';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../hooks/useToast';
+import Toast from '../../components/Toast';
 
 const Register = () => {
     const navigation = useNavigation();
     const { colors, isDark } = useAppTheme();
     const { register, loading } = useAuth();
     const { fonts, text, heading } = useFonts();
+    const { toast, showError, showSuccess, hideToast } = useToast();
     const themeKey = isDark ? 'dark' : 'light';
 
     const [formData, setFormData] = useState({
@@ -22,10 +25,20 @@ const Register = () => {
     const handleCreateAccount = async () => {
         try {
             await register(formData);
-            // Não precisa navegar manualmente - o AuthContext vai automaticamente
-            // redirecionar para o TabNavigator quando isAuthenticated for true
+            showSuccess('Conta criada com sucesso! :)');
+
+            setTimeout(() => {
+                navigation.navigate('Login' as never);
+            }, 2000);
         } catch (error: any) {
-            console.error('Erro ao criar conta:', error.message);
+            // Extrair mensagem de erro
+            // let errorMessage = 'Erro ao criar conta';
+            // if (error?.message) {
+            //     errorMessage = error.message;
+            // } else if (typeof error === 'string') {
+            //     errorMessage = error;
+            // }
+            showError("Erro ao criar conta, tente novamente.");
         }
     };
 
@@ -39,13 +52,21 @@ const Register = () => {
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
             resizeMode="cover"
         >
+            <Toast
+                visible={toast.visible}
+                message={toast.message}
+                type={toast.type}
+                duration={toast.duration}
+                onHide={hideToast}
+            />
+
             <Image
                 source={logos[themeKey]}
                 style={{ width: 93, height: 93, marginBottom: 10, marginTop: 160 }}
                 resizeMode="contain"
             />
             <View style={[styles.container]}>
-                <Text style={[heading.h1, { color: colors.text.primary, fontSize: 26, textAlign: 'center', marginTop: 0 }]}>
+                <Text style={[heading.h1, { color: colors.text.primary, fontSize: 26, fontWeight: '600', textAlign: 'center', marginTop: 0 }]}>
                     Criar Conta
                 </Text>
                 <Text style={[text.md, { color: colors.text.secondary, fontSize: 14, textAlign: 'center', marginBottom: 20 }]}>
@@ -53,7 +74,7 @@ const Register = () => {
                 </Text>
 
                 <TextInput
-                    placeholder="Nome"
+                    placeholder="Nome completo"
                     style={[styles.input, { color: colors.text.primary, borderBottomColor: colors.accent.primary, borderBottomWidth: 2 }]}
                     placeholderTextColor={colors.text.secondary}
                     value={formData.name}
@@ -99,7 +120,7 @@ const Register = () => {
                     disabled={loading}
                 >
                     <View style={styles.buttonContent}>
-                        <Text style={[heading.h2, { color: colors.text.inverse, fontSize: 18 }]}>
+                        <Text style={[heading.h2, { color: colors.text.inverse, fontSize: 18, fontWeight: '600' }]}>
                             {loading ? 'Criando...' : 'Criar Conta'}
                         </Text>
                     </View>

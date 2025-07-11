@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService, RegisterData, LoginData, User } from '../services/authService';
+import { useToast } from '../hooks/useToast';
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -27,6 +28,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { toast, showError, showSuccess, hideToast } = useToast();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
     const [initializing, setInitializing] = useState(true);
@@ -38,32 +40,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const checkAuthStatus = async () => {
         try {
-            console.log('🔍 Verificando status de autenticação...');
+            console.log('Verificando status de autenticação...');
 
             const hasToken = await authService.isAuthenticated();
-            console.log('📱 Token encontrado:', hasToken);
+            console.log('Token encontrado:', hasToken);
 
             if (hasToken) {
-                // Se tem token, buscar dados do usuário
-                console.log('👤 Buscando dados do usuário...');
-                const userData = await authService.getMe();
+                // Se tem token, buscar dados do usuário salvos
+                console.log('Buscando dados do usuário...');
+                const userData = await authService.getStoredUser();
 
-                console.log('✅ Usuário autenticado:', userData);
-                setUser(userData);
-                setIsAuthenticated(true);
+                if (userData) {
+                    console.log('Usuário autenticado:', userData);
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                } else {
+                    console.log('Dados do usuário não encontrados');
+                    await authService.logout();
+                    setIsAuthenticated(false);
+                    setUser(null);
+                }
             } else {
-                console.log('❌ Nenhum token encontrado');
+                console.log('Nenhum token encontrado');
                 setIsAuthenticated(false);
                 setUser(null);
             }
         } catch (error) {
-            console.error('❌ Erro ao verificar autenticação:', error);
+            showError("Erro ao verificar autenticação, tente novamente.");
             // Em caso de erro, limpar dados
             await authService.logout();
             setIsAuthenticated(false);
             setUser(null);
         } finally {
-            console.log('✅ Verificação de autenticação concluída');
+            console.log('Verificação de autenticação concluída');
             setInitializing(false);
         }
     };
@@ -71,21 +80,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (data: LoginData) => {
         try {
             setLoading(true);
-            console.log('🔄 Iniciando login...');
+            console.log('Iniciando login...');
 
-            const response = await authService.login(data);
-            console.log('✅ Login realizado com sucesso:', response);
+            await authService.login(data);
+            console.log('Login realizado com sucesso');
 
-            // Buscar dados do usuário
-            console.log('👤 Buscando dados do usuário...');
-            const userData = await authService.getMe();
-            console.log('✅ Dados do usuário:', userData);
-
-            setUser(userData);
-            setIsAuthenticated(true);
+            // Aguardar 1 segundo antes de definir como autenticado
+            setTimeout(async () => {
+                // Tentar buscar dados completos do usuário via API
+                const userData = await authService.getMe();
+                if (userData) {
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                }
+            }, 1000);
 
         } catch (error: any) {
-            console.error('❌ Login error:', error);
+            showError("Erro ao fazer login, tente novamente.");
             throw error;
         } finally {
             setLoading(false);
@@ -95,21 +106,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const register = async (data: RegisterData) => {
         try {
             setLoading(true);
-            console.log('🔄 Iniciando registro...');
+            console.log('Iniciando registro...');
 
-            const response = await authService.register(data);
-            console.log('✅ Registro realizado com sucesso:', response);
+            await authService.register(data);
+            console.log('Registro realizado com sucesso');
 
-            // Buscar dados do usuário
-            console.log('👤 Buscando dados do usuário...');
-            const userData = await authService.getMe();
-            console.log('✅ Dados do usuário:', userData);
-
-            setUser(userData);
-            setIsAuthenticated(true);
+            // Não definir como autenticado após registro
+            // O usuário deve fazer login para ser autenticado
 
         } catch (error: any) {
-            console.error('❌ Register error:', error);
+            showError("Erro ao criar conta, tente novamente.");
             throw error;
         } finally {
             setLoading(false);
@@ -118,14 +124,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = async () => {
         try {
-            console.log('🚪 Fazendo logout...');
+            console.log('Fazendo logout...');
             await authService.logout();
         } catch (error) {
-            console.error('❌ Logout error:', error);
+            showError("Erro ao sair da conta, tente novamente.");
         } finally {
             setUser(null);
             setIsAuthenticated(false);
-            console.log('✅ Logout concluído');
+            console.log('Logout concluído');
         }
     };
 

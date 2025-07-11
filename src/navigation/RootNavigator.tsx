@@ -14,7 +14,7 @@ export const RootNavigator = () => {
         return null;
     }
 
-    console.log('🎯 Status de autenticação:', isAuthenticated ? 'Logado' : 'Não logado');
+    console.log('Status de autenticação:', isAuthenticated ? 'Logado' : 'Não logado');
 
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>

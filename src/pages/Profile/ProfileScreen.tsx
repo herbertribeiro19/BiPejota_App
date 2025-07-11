@@ -2,26 +2,40 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { useFonts } from '../../hooks/useFonts';
+import { useToast } from '../../hooks/useToast';
+import Toast from '../../components/Toast';
 
 const ProfileScreen = () => {
+    const navigation = useNavigation();
     const { colors } = useAppTheme();
     const { logout, user, loading } = useAuth();
     const { heading, text } = useFonts();
+    const { toast, showSuccess, showError, hideToast } = useToast();
 
     const handleLogout = async () => {
         try {
-            console.log('🚪 Iniciando logout...');
+            console.log('Iniciando logout...');
             await logout();
-            console.log('✅ Logout realizado com sucesso!');
-            // Não precisa navegar manualmente - o sistema faz automaticamente
+            setTimeout(() => {
+                navigation.navigate('Auth' as never);
+            }, 2000);
         } catch (error) {
-            console.error('❌ Erro ao fazer logout:', error);
+            showError("Erro ao sair da conta, tente novamente.");
         }
     };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Toast
+                visible={toast.visible}
+                message={toast.message}
+                type={toast.type}
+                duration={toast.duration}
+                onHide={hideToast}
+            />
+
             <Text style={[heading.h1, { color: colors.text.primary }]}>
                 Perfil
             </Text>
